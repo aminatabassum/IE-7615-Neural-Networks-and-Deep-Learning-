@@ -1,0 +1,57 @@
+import numpy as np  
+
+import pandas as pd  
+
+import matplotlib.pyplot as plt  
+
+import seaborn as sns 
+
+ 
+df=pd.read_csv('diabetic_data.csv') 
+
+df.shape 
+
+
+df.dtypes 
+
+ 
+df.head(10) 
+
+df.tail(15) 
+
+ 
+
+df.describe() 
+
+ 
+
+df['gender'].value_counts().plot(kind='bar') 
+
+plt.xlabel('Gender',labelpad=14) 
+
+plt.ylabel('Count of people',labelpad=14) 
+
+ 
+
+count=df['race'].value_counts() 
+ 
+
+df['count']=df.groupby('race')['race'].transform('count') 
+
+ 
+
+fig=plt.figure(figsize=(10,8)) 
+
+sns.barplot(data=df,x='gender',y='count',hue='race') 
+
+plt.show() 
+
+corr_matrix=df.corr() 
+
+corr_matrix 
+
+hmp=sns.heatmap(corr_matrix) 
+
+plt.show() 
+
+ 
