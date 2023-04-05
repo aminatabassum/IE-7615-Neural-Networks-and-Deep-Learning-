@@ -1,0 +1,155 @@
+
+######### Problem 1 
+
+import tensorflow as tf 
+import tensorflow_datasets as tfds
+
+print('tensorflow version is: ',tf.__version__)
+print('datset version is : ', tfds.__version__)
+
+#load dataset 
+(training_ds,validation_ds,test_ds),info=tfds.load('mnist',split=['train[:90%]','train[90%:]','test'],shuffle_files=True,as_supervised=True,with_info=True )
+
+training_ds,validation_ds,test_ds
+
+def normalize_img(image,label):
+    image=tf.cast(image,tf.float32)
+    image=image/255.0
+    return image,label
+    
+batch_size=64
+buffer_size=10000
+
+#training data pipeline
+training_ds=training_ds.map(normalize_img,num_parallel_calls=tf.data.AUTOTUNE)
+training_ds=training_ds.cache()
+training_ds=training_ds.shuffle(buffer_size)
+training_ds=training_ds.batch(batch_size)
+training_ds=training_ds.prefetch(tf.data.AUTOTUNE)
+
+#validation data pipeline 
+validation_ds=validation_ds.map(normalize_img,num_parallel_calls=tf.data.AUTOTUNE)
+validation_ds=validation_ds.batch(batch_size)
+validation_ds=validation_ds.cache()
+validation_ds=validation_ds.prefetch(tf.data.AUTOTUNE)
+
+#test data pipeline 
+test_ds=test_ds.map(normalize_img,num_parallel_calls=tf.data.AUTOTUNE)
+test_ds=test_ds.batch(batch_size)
+test_ds=test_ds.cache()
+test_ds=test_ds.prefetch(tf.data.AUTOTUNE)
+
+print(training_ds.element_spec)
+print(validation_ds.element_spec)
+print(test_ds.element_spec)
+
+from tensorflow.keras import Sequential
+from tensorflow.keras.layers import Conv2D, Dense, Flatten, MaxPool2D
+from tensorflow.keras.callbacks import EarlyStopping
+
+model=Sequential()
+model.add(Conv2D(32,(3,3),padding='same',strides=1,activation='relu',input_shape=(28,28,1)))
+model.add(Conv2D(64,(3,3),padding='same',strides=1,activation='relu'))
+model.add(MaxPool2D())
+model.add(Flatten())
+model.add(Dense(128,activation='relu'))
+model.add(Dense(10,activation='softmax'))
+
+
+model.compile(tf.optimizers.Adam(learning_rate=0.001,beta_1=0.9,beta_2=0.999,epsilon=1e-7,name='Adam'),loss='sparse_categorical_crossentropy',metrics=['accuracy'])
+
+
+history=model.fit(training_ds,epochs=6,validation_data=validation_ds)
+
+model.summary()
+testing_loss,testing_Acc=model.evaluate(test_ds)
+print('test dataset accuracy is:',testing_Acc)
+print('loss is', testing_loss)
+
+######Problem 2
+
+import tensorflow as tf 
+import tensorflow_datasets as tfds
+
+print('tensorflow version is: ',tf.__version__)
+print('datset version is : ', tfds.__version__)
+
+#load dataset 
+(training_ds,validation_ds,test_ds),info=tfds.load('mnist',split=['train[:90%]','train[90%:]','test'],shuffle_files=True,as_supervised=True,with_info=True )
+
+training_ds,validation_ds,test_ds
+
+def normalize_img(image,label):
+    image=tf.cast(image,tf.float32)
+    image=image/255.0
+    return image,label
+    
+    
+batch_size=64
+buffer_size=10000
+
+#training data pipeline
+training_ds=training_ds.map(normalize_img,num_parallel_calls=tf.data.AUTOTUNE)
+training_ds=training_ds.cache()
+training_ds=training_ds.shuffle(buffer_size)
+training_ds=training_ds.batch(batch_size)
+training_ds=training_ds.prefetch(tf.data.AUTOTUNE)
+
+#validation data pipeline 
+validation_ds=validation_ds.map(normalize_img,num_parallel_calls=tf.data.AUTOTUNE)
+validation_ds=validation_ds.batch(batch_size)
+validation_ds=validation_ds.cache()
+validation_ds=validation_ds.prefetch(tf.data.AUTOTUNE)
+
+#test data pipeline 
+test_ds=test_ds.map(normalize_img,num_parallel_calls=tf.data.AUTOTUNE)
+test_ds=test_ds.batch(batch_size)
+test_ds=test_ds.cache()
+test_ds=test_ds.prefetch(tf.data.AUTOTUNE)
+
+print(training_ds.element_spec)
+print(validation_ds.element_spec)
+print(test_ds.element_spec)
+
+
+model_mlp=Sequential()
+model_mlp.add(Flatten())
+model_mlp.add(Dense(300,activation='relu',input_shape=(784,)))
+model_mlp.add(Dense(100,activation='relu'))
+model_mlp.add(Dense(10,activation='softmax'))
+
+model_mlp.compile(tf.optimizers.Adam(learning_rate=0.001,beta_1=0.9,beta_2=0.999,epsilon=1e-7,name='Adam'),loss='sparse_categorical_crossentropy',metrics=['accuracy'])
+
+history_mlp=model_mlp.fit(training_ds,epochs=6,validation_data=validation_ds)
+
+model_mlp.summary()
+
+testing_loss,testing_Acc=model_mlp.evaluate(test_ds)
+print('test dataset accuracy is:',testing_Acc)
+print('loss is', testing_loss)
+
+
+#####Problem 3
+
+
+model_mlp_1=Sequential()
+model_mlp_1.add(Flatten())
+model_mlp_1.add(Dense(100,activation='relu',input_shape=(784,)))
+model_mlp_1.add(Dense(10,activation='softmax'))
+
+model_mlp_1.compile(tf.optimizers.Adam(learning_rate=0.001,beta_1=0.9,beta_2=0.999,epsilon=1e-7,name='Adam'),loss='sparse_categorical_crossentropy',metrics=['accuracy'])
+
+history_mlp_1=model_mlp_1.fit(training_ds,epochs=6,validation_data=validation_ds)
+
+model_mlp_1.summary()
+testing_loss,testing_Acc=model_mlp_1.evaluate(test_ds)
+print('test dataset accuracy is:',testing_Acc)
+print('loss is', testing_loss)
+
+
+
+
+    
+
+
+
